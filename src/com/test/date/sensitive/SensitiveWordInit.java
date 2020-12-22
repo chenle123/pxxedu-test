@@ -1,0 +1,96 @@
+package com.test.date.sensitive;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.util.*;
+
+/**
+ * @ClassName SensitiveWordInit
+ * @Description 敏感词初始化
+ * @Author bianliang
+ * @Date 2020/1/11 21:11
+ * @Version 1.0
+ */
+
+public class SensitiveWordInit {
+
+    private String ENCODING = "utf-8";
+    @SuppressWarnings("rawtypes")
+    public HashMap sensitiveWordMap;
+
+    public SensitiveWordInit(){
+        super();
+    }
+
+    @SuppressWarnings("rawtypes")
+    public Map initKeyWord(){
+        try {
+            Set<String> keyWordSet = readSensitiveWordFile();
+            addSensitiveWordToHashMap(keyWordSet);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sensitiveWordMap;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private void addSensitiveWordToHashMap(Set<String> keyWordSet) {
+        sensitiveWordMap = new HashMap(keyWordSet.size());
+        String key = null;
+        Map nowMap = null;
+        Map<String, String> newWorMap = null;
+        //迭代keyWordSet
+        Iterator<String> iterator = keyWordSet.iterator();
+        while(iterator.hasNext()){
+            key = iterator.next();
+            nowMap = sensitiveWordMap;
+            for(int i = 0 ; i < key.length() ; i++){
+                char keyChar = key.charAt(i);
+                Object wordMap = nowMap.get(keyChar);
+
+                if(wordMap != null){
+                    nowMap = (Map) wordMap;
+                }
+                else{
+                    newWorMap = new HashMap<String,String>();
+                    newWorMap.put("isEnd", "0");
+                    nowMap.put(keyChar, newWorMap);
+                    nowMap = newWorMap;
+                }
+
+                if(i == key.length() - 1){
+                    nowMap.put("isEnd", "1");
+                }
+            }
+        }
+    }
+
+
+    @SuppressWarnings("resource")
+    private Set<String> readSensitiveWordFile() throws Exception{
+        Set<String> set = null;
+
+        File file = new File("/sensitiveword/hotdynamic/sensitiveword.txt");
+        InputStreamReader read = new InputStreamReader(new FileInputStream(file),ENCODING);
+        try {
+            if(file.isFile() && file.exists()){
+                set = new HashSet<String>();
+                BufferedReader bufferedReader = new BufferedReader(read);
+                String txt = null;
+                while((txt = bufferedReader.readLine()) != null){
+                    set.add(txt);
+                }
+            }
+            else{
+                throw new Exception("敏感词库文件不存在");
+            }
+        } catch (Exception e) {
+            throw e;
+        }finally{
+            read.close();
+        }
+        return set;
+    }
+}
