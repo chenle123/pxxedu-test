@@ -13,8 +13,6 @@ public class Test {
     public void execute(CallBack callBack){
         System.out.println("do something before...123");
 
-        callBack.callBack();
-
         System.out.println("do something after...12");
     }
 }
