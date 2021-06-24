@@ -19,6 +19,6 @@ public class TypeTest {
 
         i = j;
 
-        System.out.println(i);
+        System.out.println(i+"===");
     }
 }
